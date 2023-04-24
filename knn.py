@@ -1,9 +1,19 @@
 import csv
 import re
 import random
+from math import sqrt
 
-def knn(dataset, query_point, num_of_iterations):
+def knn(dataset, query_point, num_of_neighbors):
 	pass
+
+def euclidian_dist(a, b):
+	cols = list(a)
+	sum_of_squared_diffs = 0
+	for col in cols:
+		comp_a = a[col]
+		comp_b = b[col]
+		sum_of_squared_diffs = sum_of_squared_diffs + ( (comp_a - comp_b) ** 2 )
+	return sqrt(sum_of_squared_diffs)
 
 
 '''
