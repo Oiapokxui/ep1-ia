@@ -3,10 +3,36 @@ import re
 import random
 from math import sqrt
 
-def knn(dataset, query_point, num_of_neighbors):
-	pass
+def knn(training_data:list[dict], query_point:dict, num_of_neighbors:int):
 
-def euclidian_dist(a, b):
+	# A tuple where the first element is the euclidian distance between the query point and a training point
+	# and the second element is the index of the training point in the dataset
+	def make_distance_tuple(y, ind_y) : (euclidian_dist(query_point, y), ind_y)
+
+	distances = list(
+		map(
+			make_distance_tuple,
+			training_data,
+			range(0, len(training_data))
+		)
+	)
+
+	def get_distance(dist_tuple) : dist_tuple[0]
+	def get_point_index(dist_tuple) : dist_tuple[1]
+	def get_point_from_dataset(point_index) : training_data[point_index]
+	def get_class_of_point(point) : point["a16"]
+
+	sorted_distances = sorted(distances, key=get_distance, reverse=True)
+	k_nearest_neighbors_index = map(get_point_index, sorted_distances[:num_of_neighbors])
+	k_nearest_neighbors = map(get_point_from_dataset, k_nearest_neighbors_index)
+
+	knn_classes = list(map(get_class_of_point, k_nearest_neighbors))
+	plus_class_occurrences  = knn_classes.count("+")
+	minus_class_occurrences  = knn_classes.count("-")
+	return plus_class_occurrences if plus_class_occurrences > minus_class_occurrences else minus_class_occurrences
+
+
+def euclidian_dist(a:dict, b:dict) -> float:
 	cols = list(a)
 	sum_of_squared_diffs = 0
 	for col in cols:
