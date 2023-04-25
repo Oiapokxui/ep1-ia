@@ -1,3 +1,10 @@
+'''
+Integrantes
+Enrique Emanuel Rezende Tavares da Silva - 11796090
+Guilherme Dias Jimenes - 11911021
+Ronald Cosmo de Sousa - 11909783
+'''
+
 import csv
 import re
 import random
