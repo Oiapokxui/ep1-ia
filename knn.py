@@ -14,12 +14,12 @@ from math import sqrt
 
 def knn(training_data:list[dict], query_point:dict, num_of_neighbors:int):
 	'''
-	A tuple where the first element is the euclidian distance between the query point and a training point
+	Returns a tuple where the first element is the euclidian distance between the query point and a training point
 	and the second element is the index of the training point in the dataset
 	'''
 	def make_distance_tuple(y, ind_y) : return (euclidian_dist(query_point, y), ind_y)
 
-	distances = list(
+	distances_from_query_point = list(
 		map(
 			make_distance_tuple,
 			training_data,
@@ -32,7 +32,7 @@ def knn(training_data:list[dict], query_point:dict, num_of_neighbors:int):
 	def get_point_from_dataset(point_index) : return training_data[point_index]
 	def get_class_of_point(point) : return point["a16"]
 
-	sorted_distances = sorted(distances, key=get_distance, reverse=True)
+	sorted_distances = sorted(distances_from_query_point, key=get_distance)
 	k_nearest_neighbors_index = map(get_point_index, sorted_distances[:num_of_neighbors])
 	k_nearest_neighbors = map(get_point_from_dataset, k_nearest_neighbors_index)
 
@@ -79,6 +79,7 @@ And the whole dataset would look like this:
 
 '''
 def read_dataset():
+	print("Reading dataset `Credit Approval`")
 	with open('data/crx.data', 'r') as file:
 		reader = csv.DictReader(file)
 		data = []
@@ -122,6 +123,7 @@ def one_hot_encoding(dataset: dict, column: str):
 
 
 def  one_hot_encode_all_columns(dataset) :
+	print("One-hot encoding columns a1, a4, a5, a6, a7, a10, a12, a13")
 	to_encode = deepcopy(dataset)
 	one_hot_encoding(to_encode, "a1")
 	one_hot_encoding(to_encode, "a4")
@@ -141,6 +143,7 @@ Divides the data into a set of training data (70%) and a set of query data (30%)
 Returns a tuple  (training_data, query_data)
 """
 def divide_data(dataset):
+	print("Dividing data intro training and query sets")
 	dataset_size = len(dataset)
 	target_training_quantity = int( 0.7 * dataset_size )
 	training_data = random.choices(dataset, k=target_training_quantity)
@@ -153,6 +156,7 @@ Normalizes the dataset by diving each value on a column by the maximum value of
 that column found in the dataset
 """
 def normalize_dataset(dataset):
+	print("Normalizing scale of columns with continuous numbers")
 	dataset = remove_null(dataset)
 	max_values = {}
 	for row in dataset:
@@ -178,6 +182,7 @@ def normalize_dataset(dataset):
 Calculates the accuracy of running k-NN
 """
 def accuracy(points, predicted_values) :
+	print("Calculating accuracy of k-NN implemented")
 	num_of_points = len(points)
 	true_predictions = 0
 
@@ -199,7 +204,7 @@ After running the algorithm, it outputs to STDOUT the accuracy obtained from que
 training data and comparing expected classes X predicted classes.
 """
 def main() :
-	neighbors = 7
+	neighbors = 100
 	data = read_dataset()
 	normalized_data = normalize_dataset(data)
 	encoded_data = one_hot_encode_all_columns(normalized_data)
