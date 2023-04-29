@@ -1,5 +1,4 @@
 from functools import reduce
-import math
 import random
 
 
@@ -30,21 +29,26 @@ def train_perceptron(dataset, responses, threshold, max_iter, activation_functio
 
 def perceptron_iter(dataset, responses, initial_weights, max_iter, threshold, activation_function):
     iter = 0
-    current_error = math.inf
+    current_error = 0
     current_weights = initial_weights
     current_response = 0
 
-    while iter < max_iter and current_error < threshold:
+    while iter < max_iter and (current_error > threshold or iter == 0) :
         print(f"Epoch: {iter} out of {max_iter}")
 
-        for vector, expected_response in (dataset, responses):
+        current_error = 0
+
+        for vector, expected_response in zip(dataset, responses):
             current_response = make_network_neuron_response(
-                vector, current_weights, activation_function)
+                vector,
+                current_weights,
+                activation_function
+            )
             error = expected_response - current_response
             current_error = current_error + (error ** 2)
             current_weights = update_weights(vector, current_weights, error, 1)
 
-        iter + iter + 1
+        iter = iter + 1
 
     print(f"Finished with {iter} epochs")
 
@@ -107,7 +111,7 @@ def image_dataset():
 
 
 def train_logical_or_dataset(threshold, max_iter):
-    print("]nTraining for logical OR dataset")
+    print("\nTraining for logical OR dataset")
     or_dataset, or_responses = logical_or_dataset()
 
     return train_perceptron(
@@ -133,8 +137,8 @@ def train_image_dataset(threshold, max_iter):
 
 
 def main():
-    threshold = 0.1
-    max_iter = 200
+    threshold = 0.01
+    max_iter = 1000
 
     train_logical_or_dataset(threshold, max_iter)
 
