@@ -1,17 +1,25 @@
+'''
+Integrantes
+Enrique Emanuel Rezende Tavares da Silva - 11796090
+Guilherme Dias Jimenes - 11911021
+Ronald Cosmo de Sousa - 11909783
+'''
 from functools import reduce
 import random
 
 
-def train_perceptron(dataset, responses, threshold, max_iter, activation_function):
+def train_perceptron(dataset, responses, threshold, max_iter, learning_rate, activation_function):
     input_len = len(dataset)
     weights = initialize_weights(input_len)
-    print(f"Initial weights: {weights}")
+    print(f"Initial weights: {weights}\n")
+
     final_weights = perceptron_iter(
         dataset,
         responses,
         weights,
         max_iter,
         threshold,
+        learning_rate,
         activation_function
     )
     final_responses = list(map(
@@ -27,7 +35,7 @@ def train_perceptron(dataset, responses, threshold, max_iter, activation_functio
     return final_weights
 
 
-def perceptron_iter(dataset, responses, initial_weights, max_iter, threshold, activation_function):
+def perceptron_iter(dataset, responses, initial_weights, max_iter, threshold, learning_rate, activation_function):
     iter = 0
     current_error = 0
     current_weights = initial_weights
@@ -46,7 +54,7 @@ def perceptron_iter(dataset, responses, initial_weights, max_iter, threshold, ac
             )
             error = expected_response - current_response
             current_error = current_error + (error ** 2)
-            current_weights = update_weights(vector, current_weights, error, 1.2)
+            current_weights = update_weights(vector, current_weights, error, learning_rate)
 
         iter = iter + 1
 
@@ -57,7 +65,7 @@ def perceptron_iter(dataset, responses, initial_weights, max_iter, threshold, ac
 
 def update_weights(inputs, weights, error, learning_rate):
     def update_weight(component, weight):
-        return weight - (learning_rate * component * error)
+        return weight + (learning_rate * component * error)
     return list(map(update_weight, inputs, weights))
 
 
@@ -89,28 +97,28 @@ def make_logical_or_dataset():
 
 def make_image_dataset():
     inputs = [
-        [0, 0, 0, 0],
-        [0, 0, 0, 1],
-        [0, 0, 1, 1],
-        [0, 1, 1, 1],
+        [-1, -1, -1, -1],
+        [-1, -1, -1, 1],
+        [-1, -1, 1, 1],
+        [-1, 1, 1, 1],
         [1, 1, 1, 1],
-        [0, 0, 1, 0],
-        [0, 0, 1, 1],
-        [0, 1, 0, 0],
-        [0, 1, 0, 1],
-        [1, 0, 0, 0],
-        [1, 0, 0, 1],
-        [1, 0, 1, 1],
-        [1, 1, 0, 0],
-        [1, 1, 0, 1],
-        [1, 0, 1, 0],
-        [1, 0, 1, 1]
+        [-1, -1, 1, -1],
+        [-1, -1, 1, 1],
+        [-1, 1, -1, -1],
+        [-1, 1, -1, 1],
+        [1, -1, -1, -1],
+        [1, -1, -1, 1],
+        [1, -1, 1, 1],
+        [1, 1, -1, -1],
+        [1, 1, -1, 1],
+        [1, -1, 1, -1],
+        [1, -1, 1, 1]
     ]
     responses = list(map(lambda x: 1 if x.count(1) > 1 else -1, inputs))
     return inputs, responses
 
 
-def train_logical_or_dataset(threshold, max_iter):
+def train_logical_or_dataset(threshold, max_iter, learning_rate):
     print("\nTraining for logical OR dataset")
     or_dataset, or_responses = make_logical_or_dataset()
 
@@ -119,11 +127,12 @@ def train_logical_or_dataset(threshold, max_iter):
         or_responses,
         threshold,
         max_iter,
+        learning_rate,
         lambda net: bipolar_degree(1, 0, net, threshold)
     )
 
 
-def train_image_dataset(threshold, max_iter):
+def train_image_dataset(threshold, max_iter, learning_rate):
     print("\nTraining for 2x2 images dataset")
     image_dataset, image_responses = make_image_dataset()
 
@@ -132,17 +141,19 @@ def train_image_dataset(threshold, max_iter):
         image_responses,
         threshold,
         max_iter,
+        learning_rate,
         lambda net: bipolar_degree(1, -1, net, threshold)
     )
 
 
 def main():
-    threshold = 0.1
-    max_iter = 1000
+    threshold = 0.0001
+    max_iter = 100
+    learning_rate = 3
 
-    train_logical_or_dataset(threshold, max_iter)
+    train_logical_or_dataset(threshold, max_iter, learning_rate)
 
-    train_image_dataset(threshold, max_iter)
+    train_image_dataset(threshold, max_iter, learning_rate)
 
 
 if (__name__ == "__main__"):
