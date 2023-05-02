@@ -46,7 +46,7 @@ def perceptron_iter(dataset, responses, initial_weights, max_iter, threshold, ac
             )
             error = expected_response - current_response
             current_error = current_error + (error ** 2)
-            current_weights = update_weights(vector, current_weights, error, 1)
+            current_weights = update_weights(vector, current_weights, error, 1.2)
 
         iter = iter + 1
 
@@ -56,8 +56,8 @@ def perceptron_iter(dataset, responses, initial_weights, max_iter, threshold, ac
 
 
 def update_weights(inputs, weights, error, learning_rate):
-    def update_weight(component, weight): return weight - \
-        (learning_rate * component * error)
+    def update_weight(component, weight):
+        return weight - (learning_rate * component * error)
     return list(map(update_weight, inputs, weights))
 
 
@@ -81,13 +81,13 @@ def bipolar_degree(max, min, net_value: float, threshold: float):
     return max if net_value >= threshold else min
 
 
-def logical_or_dataset():
+def make_logical_or_dataset():
     inputs = [[0, 0], [0, 1], [1, 0], [1, 1]]
     responses = list(map(lambda x: any(x), inputs))
     return inputs, responses
 
 
-def image_dataset():
+def make_image_dataset():
     inputs = [
         [0, 0, 0, 0],
         [0, 0, 0, 1],
@@ -112,7 +112,7 @@ def image_dataset():
 
 def train_logical_or_dataset(threshold, max_iter):
     print("\nTraining for logical OR dataset")
-    or_dataset, or_responses = logical_or_dataset()
+    or_dataset, or_responses = make_logical_or_dataset()
 
     return train_perceptron(
         or_dataset,
@@ -125,7 +125,7 @@ def train_logical_or_dataset(threshold, max_iter):
 
 def train_image_dataset(threshold, max_iter):
     print("\nTraining for 2x2 images dataset")
-    image_dataset, image_responses = logical_or_dataset()
+    image_dataset, image_responses = make_image_dataset()
 
     return train_perceptron(
         image_dataset,
@@ -137,7 +137,7 @@ def train_image_dataset(threshold, max_iter):
 
 
 def main():
-    threshold = 0.01
+    threshold = 0.1
     max_iter = 1000
 
     train_logical_or_dataset(threshold, max_iter)
