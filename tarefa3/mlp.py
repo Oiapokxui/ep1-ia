@@ -29,7 +29,9 @@ def train_for_dataset(
         output_layer_dimensions
     )
 
-    print(f"Training for each example")
+    print(f"Initial Weights: {weights}")
+
+    print(f"\nTraining for each example in the dataset\n")
 
     for input, response in zip(inputs, responses):
         weights = train_for_input(
@@ -45,6 +47,7 @@ def train_for_dataset(
             max_iter
         )
 
+    print(f"Final Weights: {weights}\n")
     return weights
 
 
@@ -93,11 +96,11 @@ def train_network_iter(
     error_sum = math.inf
     curr_epoch = 0
 
-    print(f"Initial weights: {weights}\n")
+    # print(f"Initial weights: {weights}\n")
 
     while error_sum > threshold and curr_epoch < max_epochs:
 
-        print(f"Training for epoch: {curr_epoch}")
+        # print(f"Training for epoch: {curr_epoch}")
 
         network = feed_forward_network(
             input_layer,
@@ -135,7 +138,7 @@ def train_network_iter(
 
         curr_epoch = curr_epoch + 1
 
-    print(f"\nFinal weights: {weights}\n")
+    # print(f"\nFinal weights: {weights}\n")
     return weights
 
 
@@ -309,9 +312,12 @@ def feed_forward_layer(vector, weights_matrix, biases, activation_function):
     """
 
     def feed_forward_neuron(vector, weights, activation_function):
-        dims_range = range(len(vector))
+        vector_size = len(vector)
+        dims_range = range(vector_size)
         linear_combination = map(
-            lambda dim: vector[dim] * weights[dim], dims_range)
+            lambda dim: vector[dim] * weights[dim],
+            dims_range
+        )
         net = reduce(lambda item, acc: item + acc, linear_combination)
         return activation_function(net)
 
@@ -344,7 +350,6 @@ def hyperbolic_tangent_derivative(net_value: float):
 
 
 def read_dataset():
-
     '''
     Returns a list of dicts corresponding to the dataset.
 
@@ -367,8 +372,8 @@ def read_dataset():
 
     '''
     print("Reading dataset `Haberman's Survival`")
-    with open('data/haberman.data', 'r') as file:
-        reader = csv.reader(file)
+    with open('tarefa3/data/haberman.data', 'r') as file:
+        reader = csv.reader(file, quoting=csv.QUOTE_NONNUMERIC)
         # data = []
         inputs = []
         responses = []
@@ -392,11 +397,11 @@ def make_all_responses(
         activation_function
 ):
     obtained_responses = []
-    for input, weight in zip(inputs, weights):
+    for input in inputs:
         final_network = feed_forward_network(
             input,
-            weight,
-            weight,
+            weights,
+            weights,
             num_of_hidden_layers + 2,
             activation_function["self"]
         )
@@ -405,14 +410,29 @@ def make_all_responses(
     return obtained_responses
 
 
+def accuracy(responses, obtained_responses):
+    correct_predictions = 0
+    total_predictions = len(responses)
+
+    for expected, obtained in zip(responses, obtained_responses):
+        expected_label = [1, 0] if expected[0] > expected[1] else [0, 1]
+        obtained_label = [1, 0] if obtained[0] > obtained[1] else [0, 1]
+
+        if expected_label == obtained_label:
+            correct_predictions += 1
+
+    accuracy = correct_predictions / total_predictions
+    return accuracy
+
+
 def main():
     # ==HYPERPARAMETERS==
-    num_of_hidden_layers = 1
-    hidden_layer_dimensions = 2
+    num_of_hidden_layers = 2
+    hidden_layer_dimensions = 4
     output_layer_dimensions = 2
     threshold = 0.0001
     max_iter = 1000
-    learning_rate = 3
+    learning_rate = 1.2
     # ===================
 
     inputs, responses = read_dataset()
@@ -435,7 +455,7 @@ def main():
         num_of_hidden_layers,
         hidden_layer_dimensions,
         output_layer_dimensions,
-        hyperbolic_func,
+        sigmoid_func,
         learning_rate,
         threshold,
         max_iter
@@ -448,12 +468,8 @@ def main():
         sigmoid_func
     )
 
-    # acurácia - recebe `responses` e `obtained_responses`` e calcula a acurácia.
-    # Assumir que ambas variáveis possuem o mesmo tamanho
-    # `responses` é uma lista de lista de número. Ex: [[1, 0], [0, 1]]
-    # `obtained_responses` é uma lista de lista de número. Ex: [[0.95345430264330141, 0.504770300112502], [0.5047703001125020, 0.5047703001125021]]
-    # Para `obtained_responses`, considere que se o primeiro elemento for maior que o segundo, a lista pode ser iterpretada como [1,0]
-    # e se o segundo elemento foi maior que o primeiro, a lista pode ser interpretada como [0,1]
+    accuracy_mlp = accuracy(responses, obtained_responses)
+    print(f"Accuracy obtained: {accuracy_mlp}")
 
 
 if (__name__ == "__main__"):
