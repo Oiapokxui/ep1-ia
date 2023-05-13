@@ -277,11 +277,17 @@ def initialize_network_weights(
     weights = [initialize_weights(hidden_layer_dimensions, input_layer_dims)]
     for _ in range(num_of_hidden_layers):
         weights.append(
-            initialize_weights(hidden_layer_dimensions,
-                               hidden_layer_dimensions)
+            initialize_weights(
+                hidden_layer_dimensions,
+                hidden_layer_dimensions
+            )
         )
-    weights.append(initialize_weights(
-        output_layer_dimensions, hidden_layer_dimensions))
+    weights.append(
+        initialize_weights(
+            output_layer_dimensions,
+            hidden_layer_dimensions
+        )
+    )
     return weights
 
 
@@ -297,7 +303,10 @@ def update_layer_weights(layer, weights, deltas, learning_rate):
         weights_vector = weights[neuron_index]
         new_weights_vector = list(map(
             lambda weight: update_weight(
-                weight, layer[neuron_index], deltas[neuron_index]),
+                weight,
+                layer[neuron_index],
+                deltas[neuron_index]
+            ),
             weights_vector
         ))
         new_weights_matrix.append(new_weights_vector)
@@ -324,7 +333,10 @@ def feed_forward_layer(vector, weights_matrix, biases, activation_function):
     # This expects that weights is a list of weight's vector (another list)
     return list(map(
         lambda weights_vector: feed_forward_neuron(
-            vector, weights_vector, activation_function),
+            vector,
+            weights_vector,
+            activation_function
+        ),
         weights_matrix
     ))
 
@@ -374,12 +386,10 @@ def read_dataset():
     print("Reading dataset `Haberman's Survival`")
     with open('tarefa3/data/haberman.data', 'r') as file:
         reader = csv.reader(file, quoting=csv.QUOTE_NONNUMERIC)
-        # data = []
         inputs = []
         responses = []
 
         for row in reader:
-            # data.append(row)
             input_attributes = row[:3]
             response_attributes = row[3]    # 1 ou 2
             inputs.append(input_attributes)
@@ -426,6 +436,16 @@ def accuracy(responses, obtained_responses):
 
 
 def main():
+    sigmoid_func = {
+        "self": sigmoid,
+        "derivative": sigmoid_derivative
+    }
+
+    hyperbolic_func = {
+        "self": hyperbolic_tangent,
+        "derivative": hyperbolic_tangent_derivative
+    }
+
     # ==HYPERPARAMETERS==
     num_of_hidden_layers = 2
     hidden_layer_dimensions = 4
@@ -436,16 +456,6 @@ def main():
     # ===================
 
     inputs, responses = read_dataset()
-
-    sigmoid_func = {
-        "self": sigmoid,
-        "derivative": sigmoid_derivative
-    }
-
-    hyperbolic_func = {
-        "self": hyperbolic_tangent,
-        "derivative": hyperbolic_tangent_derivative
-    }
 
     assert len(responses[0]) == output_layer_dimensions
 
